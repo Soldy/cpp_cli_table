@@ -44,11 +44,11 @@ class Table{
     std::string renderLine(
       std::vector<std::string> columns,
       std::vector<int> size
-    {
+    ){
         std::string out = element_separator;
         for(int i = 0 ; i < size.size(); i++){
             out += columns[i];
-            out.append(size[i]-columns[i].length(), " ");
+            out.append(size[i]-columns[i].length(), ' ');
             out += element_separator;
         }
         return out;
@@ -62,7 +62,7 @@ class Table{
         for(int & i : size){
             if (line > 0)
                 out += this->elements[elem_name]["middle"];
-            out.append(i," ");
+            out.append(i, ' ');
         }
         out += this->elements[elem_name]["end"];
         return out;
@@ -93,5 +93,5 @@ class Table{
         );
         return out;
     };
-}
+};
 }
