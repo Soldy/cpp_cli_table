@@ -1,6 +1,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <iostream>
 
 namespace ctcpp{
 class Table{
@@ -15,7 +16,7 @@ class Table{
         },
         { "center", {
             { "start", "\u251c" },
-            { "middlei", "\u253c" },
+            { "middle", "\u253c" },
             { "line", "\u2500" },
             { "end", "\u2524" }
           }
@@ -29,12 +30,18 @@ class Table{
         }
     };
     std::string element_separator = "\u2502";
-    std::vector<int> calcSize(
+    std::vector<unsigned int> calcSize(
       std::vector<std::vector<std::string>> data
     ){
-         std::vector<int> out;
+         std::vector<unsigned int> out;
+         unsigned int max_columns = data[0].size();
+         for (auto & line : data)
+             if(max_columns < line.size())
+                 max_columns = line.size();
+         for (unsigned int i = 0 ; i < max_columns ; i++)
+              out.push_back(0);
          for (auto & line : data){
-             for (int i = 0 ; i < line.size() ; i++){
+             for (unsigned int i = 0 ; i < line.size() ; i++){
                  if(out[i] < line[i].length())
                      out[i] = line[i].length();
              }
@@ -43,28 +50,39 @@ class Table{
     };
     std::string renderLine(
       std::vector<std::string> columns,
-      std::vector<int> size
+      std::vector<unsigned int> size
     ){
-        std::string out = element_separator;
-        for(int i = 0 ; i < size.size(); i++){
+        std::string out = this->element_separator;
+        for(unsigned int i = 0 ; i < size.size(); i++){
             out += columns[i];
             out.append(size[i]-columns[i].length(), ' ');
-            out += element_separator;
+            out += this->element_separator;
         }
         return out;
     };
     std::string renderBorder ( 
-      std::vector<int> size,
+      std::vector<unsigned int> size,
       std::string elem_name
     ){
         std::string out = this->elements[elem_name]["start"];
-        int line = 0;
-        for(int & i : size){
-            if (line > 0)
+        int col = 0;
+        for(unsigned int & i : size){
+            if (col > 0)
                 out += this->elements[elem_name]["middle"];
-            out.append(i, ' ');
+            out += this->pad(i , this->elements[elem_name]["line"]);
+            col++;
         }
         out += this->elements[elem_name]["end"];
+        return out;
+
+    };
+    std::string pad(
+        unsigned int size,
+        std::string character
+    ){
+        std::string out;
+        for(unsigned int i = 0 ; size > i ; i++)
+            out += character;
         return out;
 
     };
@@ -74,17 +92,17 @@ class Table{
     ){
         std::vector<std::string> out;
         int line = 0;
-        std::vector<int> size = calcSize(data);
+        std::vector<unsigned int> size = calcSize(data);
         out.push_back(
             this->renderBorder(size, "top")
         );
-        for(int i = 0 ; i < data.size(); i++){
+        for(std::vector<std::string>& i : data){
             if(line > 0)
                 out.push_back(
                     this->renderBorder(size, "center")
                 );
             out.push_back(
-                this->renderLine(data[i],size)
+                this->renderLine(i, size)
             );
             line++;
         }

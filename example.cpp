@@ -14,4 +14,5 @@ int main(){
     );
     for(std::string i : output)
         std::cout << i << std::endl;
+    return 0;
 }
